@@ -11,5 +11,6 @@ setup(
     py_modules=['repomd'],
     extras_require={
         'tests': ['pytest'],
+        'style': ['pytest-flake8'],
     }
 )
