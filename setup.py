@@ -12,5 +12,6 @@ setup(
     extras_require={
         'tests': ['pytest'],
         'style': ['pytest-flake8'],
+        'coverage': ['pytest-cov', 'codecov']
     }
 )

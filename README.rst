@@ -2,6 +2,10 @@
    :alt: travis-ci.org
    :target: https://travis-ci.org/carlwgeorge/repomd
 
+.. image:: https://img.shields.io/codecov/c/github/carlwgeorge/repomd.svg
+   :alt: codecov.io
+   :target: https://codecov.io/gh/carlwgeorge/repomd
+
 repomd
 ======
 
