@@ -10,3 +10,12 @@ repomd
 ======
 
 This library provides an object-oriented interface to get information out of dnf/yum repositories.
+
+Usage
+-----
+
+Create a repo instance from the baseurl of the repo.
+
+.. code-block:: python
+
+   >>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64')

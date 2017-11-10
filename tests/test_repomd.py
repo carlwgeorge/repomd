@@ -2,4 +2,5 @@ import repomd
 
 
 def test_repo_init():
-    repomd.Repo()
+    repo = repomd.Repo('https://example.com')
+    assert repo.baseurl == 'https://example.com'
