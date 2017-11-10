@@ -1,3 +1,7 @@
+.. image:: https://img.shields.io/travis/carlwgeorge/repomd.svg
+   :alt: travis-ci.org
+   :target: https://travis-ci.org/carlwgeorge/repomd
+
 repomd
 ======
 
