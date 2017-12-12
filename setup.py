@@ -9,6 +9,7 @@ setup(
     license='MIT',
     package_dir={'': 'source'},
     py_modules=['repomd'],
+    install_requires=['lxml'],
     extras_require={
         'tests': ['pytest'],
         'style': ['pytest-flake8'],

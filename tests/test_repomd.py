@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 import repomd
@@ -13,6 +15,8 @@ def repodata():
     return (raw_index, raw_primary)
 
 
-def test_repo_init():
+@mock.patch('repomd.urlopen')
+def test_repo_init(mock_urlopen, repodata):
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = repodata
     repo = repomd.Repo('https://example.com')
     assert repo.baseurl == 'https://example.com'
