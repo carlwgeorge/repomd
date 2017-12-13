@@ -21,3 +21,9 @@ def test_repo_init(mock_urlopen, repodata):
     repo = repomd.Repo('https://example.com')
     assert repo.baseurl == 'https://example.com'
     assert hasattr(repo, '_metadata')
+
+
+def test_repo_init_lazy(repodata):
+    repo = repomd.Repo('https://example.com', lazy=True)
+    assert repo.baseurl == 'https://example.com'
+    assert not hasattr(repo, '_metadata')

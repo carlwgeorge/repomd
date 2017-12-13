@@ -14,9 +14,12 @@ _ns = {
 class Repo:
     __slots__ = ['baseurl', '_metadata']
 
-    def __init__(self, baseurl):
+    def __init__(self, baseurl, lazy=False):
         self.baseurl = baseurl
+        if not lazy:
+            self.load()
 
+    def load(self):
         # download and parse repomd.xml
         with urlopen(f'{self.baseurl}/repodata/repomd.xml') as response:
             index = etree.fromstring(response.read())

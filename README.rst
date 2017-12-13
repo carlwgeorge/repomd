@@ -19,3 +19,10 @@ Create a repo instance from the baseurl of the repo.
 .. code-block:: python
 
    >>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64')
+
+Delay loading of the repo metadata.
+
+.. code-block:: python
+
+   >>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64', lazy=True)
+   >>> repo.load()
