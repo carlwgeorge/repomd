@@ -33,3 +33,9 @@ class Repo:
             with BytesIO(response.read()) as compressed:
                 with GzipFile(fileobj=compressed) as uncompressed:
                     self._metadata = etree.fromstring(uncompressed.read())
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: "{self.baseurl}">'
+
+    def __str__(self):
+        return f'{self.baseurl}'

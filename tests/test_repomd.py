@@ -27,3 +27,13 @@ def test_repo_init_lazy(repodata):
     repo = repomd.Repo('https://example.com', lazy=True)
     assert repo.baseurl == 'https://example.com'
     assert not hasattr(repo, '_metadata')
+
+
+def test_repr(repodata):
+    repo = repomd.Repo('https://example.com', lazy=True)
+    assert repr(repo) == '<Repo: "https://example.com">'
+
+
+def test_str(repodata):
+    repo = repomd.Repo('https://example.com', lazy=True)
+    assert str(repo) == 'https://example.com'
