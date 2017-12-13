@@ -20,3 +20,4 @@ def test_repo_init(mock_urlopen, repodata):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = repodata
     repo = repomd.Repo('https://example.com')
     assert repo.baseurl == 'https://example.com'
+    assert hasattr(repo, '_metadata')
