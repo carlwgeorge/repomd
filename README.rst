@@ -14,6 +14,12 @@ This library provides an object-oriented interface to get information out of dnf
 Usage
 -----
 
+Import the Repo class from the module.
+
+.. code-block:: python
+
+   >>> from repomd import Repo
+
 Create a repo instance from the baseurl of the repo.
 
 .. code-block:: python
