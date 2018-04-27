@@ -9,6 +9,8 @@ setup(
     license='MIT',
     package_dir={'': 'source'},
     py_modules=['repomd'],
+    python_requires='>=3.6',
+    setup_requires=['setuptools>=24.2.0'],
     install_requires=['lxml'],
     extras_require={
         'tests': ['pytest'],
