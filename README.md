@@ -25,3 +25,10 @@ Optionally, you can delay loading of the repo metadata.
 >>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64', lazy=True)
 >>> repo.load()
 ```
+
+The length of the repo object indicates the number of packages in the repo.
+
+```python
+>>> len(repo)
+9591
+```

@@ -40,3 +40,6 @@ class Repo:
 
     def __str__(self):
         return f'{self.baseurl}'
+
+    def __len__(self):
+        return int(self._metadata.get('packages'))
