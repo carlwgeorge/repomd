@@ -9,12 +9,12 @@ import repomd
 @pytest.fixture
 @mock.patch('repomd.urlopen')
 def repo(mock_urlopen):
-    path = 'tests/fixtures/repodata'
-    with open(f'{path}/repomd.xml', 'rb') as f:
-        raw_index = f.read()
-    with open(f'{path}/primary.xml.gz', 'rb') as f:
-        raw_primary = f.read()
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = (raw_index, raw_primary)
+    repodata_path = 'tests/fixtures/repodata'
+    with open(f'{repodata_path}/repomd.xml', 'rb') as f:
+        repomd_xml = f.read()
+    with open(f'{repodata_path}/primary.xml.gz', 'rb') as f:
+        primary_xml = f.read()
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = (repomd_xml, primary_xml)
     return repomd.Repo('https://example.com')
 
 
