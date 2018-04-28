@@ -6,15 +6,18 @@ import lxml
 import repomd
 
 
+def load_repodata(path):
+    with open(f'{path}/repomd.xml', 'rb') as f:
+        repomd_xml = f.read()
+    with open(f'{path}/primary.xml.gz', 'rb') as f:
+        primary_xml = f.read()
+    return (repomd_xml, primary_xml)
+
+
 @pytest.fixture
 @mock.patch('repomd.urlopen')
 def repo(mock_urlopen):
-    repodata_path = 'tests/fixtures/repodata'
-    with open(f'{repodata_path}/repomd.xml', 'rb') as f:
-        repomd_xml = f.read()
-    with open(f'{repodata_path}/primary.xml.gz', 'rb') as f:
-        primary_xml = f.read()
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = (repomd_xml, primary_xml)
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/fixtures/repodata')
     return repomd.Repo('https://example.com')
 
 
