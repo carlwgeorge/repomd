@@ -16,6 +16,7 @@ class Repo:
 
     def __init__(self, baseurl, lazy=False):
         self.baseurl = baseurl
+        self._metadata = None
         if not lazy:
             self.load()
 

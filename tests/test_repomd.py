@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+import lxml
 
 import repomd
 
@@ -20,13 +21,13 @@ def test_repo_init(mock_urlopen, repodata):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = repodata
     repo = repomd.Repo('https://example.com')
     assert repo.baseurl == 'https://example.com'
-    assert hasattr(repo, '_metadata')
+    assert isinstance(repo._metadata, lxml.etree._Element)
 
 
 def test_repo_init_lazy():
     repo = repomd.Repo('https://example.com', lazy=True)
     assert repo.baseurl == 'https://example.com'
-    assert not hasattr(repo, '_metadata')
+    assert repo._metadata is None
 
 
 def test_repr():
