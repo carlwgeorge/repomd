@@ -23,17 +23,17 @@ def test_repo_init(mock_urlopen, repodata):
     assert hasattr(repo, '_metadata')
 
 
-def test_repo_init_lazy(repodata):
+def test_repo_init_lazy():
     repo = repomd.Repo('https://example.com', lazy=True)
     assert repo.baseurl == 'https://example.com'
     assert not hasattr(repo, '_metadata')
 
 
-def test_repr(repodata):
+def test_repr():
     repo = repomd.Repo('https://example.com', lazy=True)
     assert repr(repo) == '<Repo: "https://example.com">'
 
 
-def test_str(repodata):
+def test_str():
     repo = repomd.Repo('https://example.com', lazy=True)
     assert str(repo) == 'https://example.com'
