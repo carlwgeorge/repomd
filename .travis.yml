@@ -1,10 +1,9 @@
 language: python
 python:
   - '3.6'
-before_install:
-  - pip install --upgrade pytest
 install:
-  - pip install --editable .[tests,style,coverage]
+  - pip install pytest-flake8 pytest-cov codecov
+  - pip install --editable .
 script:
   - pytest
 after_script:

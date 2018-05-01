@@ -18,9 +18,4 @@ setup(
     python_requires='>=3.6',
     setup_requires=['setuptools>=38.6.0'],
     install_requires=['lxml'],
-    extras_require={
-        'tests': ['pytest'],
-        'style': ['pytest-flake8'],
-        'coverage': ['pytest-cov', 'codecov']
-    }
 )
