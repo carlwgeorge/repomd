@@ -23,14 +23,14 @@ class Repo:
     def load(self):
         # download and parse repomd.xml
         with urlopen(f'{self.baseurl}/repodata/repomd.xml') as response:
-            index = etree.fromstring(response.read())
+            repomd_xml = etree.fromstring(response.read())
 
         # determine the location of *primary.xml.gz
-        data = index.find('./repo:data[@type="primary"]', namespaces=_ns)
-        location = data.find('repo:location', namespaces=_ns).get('href')
+        primary_data = repomd_xml.find('./repo:data[@type="primary"]', namespaces=_ns)
+        primary_location = primary_data.find('repo:location', namespaces=_ns).get('href')
 
         # download and parse *-primary.xml
-        with urlopen(f'{self.baseurl}/{location}') as response:
+        with urlopen(f'{self.baseurl}/{primary_location}') as response:
             with BytesIO(response.read()) as compressed:
                 with GzipFile(fileobj=compressed) as uncompressed:
                     self._metadata = etree.fromstring(uncompressed.read())
