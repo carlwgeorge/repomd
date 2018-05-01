@@ -26,11 +26,10 @@ class Repo:
             repomd_xml = etree.fromstring(response.read())
 
         # determine the location of *primary.xml.gz
-        primary_data = repomd_xml.find('./repo:data[@type="primary"]', namespaces=_ns)
-        primary_location = primary_data.find('repo:location', namespaces=_ns).get('href')
+        location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
 
         # download and parse *-primary.xml
-        with urlopen(f'{self.baseurl}/{primary_location}') as response:
+        with urlopen(f'{self.baseurl}/{location}') as response:
             with BytesIO(response.read()) as compressed:
                 with GzipFile(fileobj=compressed) as uncompressed:
                     self._metadata = etree.fromstring(uncompressed.read())
