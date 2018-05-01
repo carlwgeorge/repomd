@@ -17,7 +17,7 @@ def load_repodata(path):
 @pytest.fixture
 @mock.patch('repomd.urlopen')
 def repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/repodata')
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
     return repomd.Repo('https://example.com')
 
 
@@ -29,7 +29,7 @@ def lazy_repo():
 @pytest.fixture
 @mock.patch('repomd.urlopen')
 def empty_repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/empty_repodata')
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/empty_repo/repodata')
     return repomd.Repo('https://example.com')
 
 
@@ -46,5 +46,5 @@ def test_repo_init_lazy(lazy_repo):
 
 
 def test_repo_len(repo, empty_repo):
-    assert len(repo) == 7
+    assert len(repo) == 5
     assert len(empty_repo) == 0
