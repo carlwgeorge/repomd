@@ -45,6 +45,6 @@ def test_repo_init_lazy(lazy_repo):
     assert lazy_repo._metadata is None
 
 
-def test_len(repo, empty_repo):
+def test_repo_len(repo, empty_repo):
     assert len(repo) == 7
     assert len(empty_repo) == 0
