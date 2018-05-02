@@ -32,3 +32,17 @@ The length of the repo object indicates the number of packages in the repo.
 >>> len(repo)
 9591
 ```
+
+Find a package.
+
+```python
+>>> repo.find('openssl-libs')
+<Package: "openssl-libs-1:1.0.2k-8.el7.x86_64">
+```
+
+Find all packages.
+
+```python
+>>> repo.findall('openssl-libs')
+[<Package: "openssl-libs-1:1.0.2k-8.el7.i686">, <Package: "openssl-libs-1:1.0.2k-8.el7.x86_64">]
+```

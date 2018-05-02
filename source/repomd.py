@@ -1,3 +1,5 @@
+from datetime import datetime
+from functools import partial
 from gzip import GzipFile
 from io import BytesIO
 from urllib.request import urlopen
@@ -42,3 +44,83 @@ class Repo:
 
     def __len__(self):
         return int(self._metadata.get('packages'))
+
+    def find(self, name):
+        results = self._metadata.findall(f'common:package[common:name="{name}"]', namespaces=_ns)
+        if results:
+            return Package(results[-1])
+        else:
+            return None
+
+    def findall(self, name):
+        return [
+            Package(element)
+            for element in self._metadata.findall(f'common:package[common:name="{name}"]', namespaces=_ns)
+        ]
+
+
+class Package:
+    __slots__ = [
+        'name',
+        'arch',
+        'summary',
+        'description',
+        'packager',
+        'url',
+        'license',
+        'vendor',
+        'sourcerpm',
+        'epoch',
+        'version',
+        'release',
+        'build_time',
+        'location',
+    ]
+
+    def __init__(self, element):
+        find = partial(element.find, namespaces=_ns)
+        findtext = partial(element.findtext, namespaces=_ns)
+
+        self.name = findtext('common:name')
+        self.arch = findtext('common:arch')
+        self.summary = findtext('common:summary')
+        self.description = findtext('common:description')
+        self.packager = findtext('common:packager')
+        self.url = findtext('common:url')
+        self.license = findtext('common:format/rpm:license')
+        self.vendor = findtext('common:format/rpm:vendor')
+        self.sourcerpm = findtext('common:format/rpm:sourcerpm')
+
+        self.epoch = find('common:version').get('epoch')
+        self.version = find('common:version').get('ver')
+        self.release = find('common:version').get('rel')
+
+        build_time = find('common:time').get('build')
+        self.build_time = datetime.fromtimestamp(int(build_time))
+
+        self.location = find('common:location').get('href')
+
+    @property
+    def nevra(self):
+        if int(self.epoch):
+            return f'{self.name}-{self.epoch}:{self.version}-{self.release}.{self.arch}'
+        else:
+            return f'{self.name}-{self.version}-{self.release}.{self.arch}'
+
+    @property
+    def nevr(self):
+        if int(self.epoch):
+            return f'{self.name}-{self.epoch}:{self.version}-{self.release}'
+        else:
+            return f'{self.name}-{self.version}-{self.release}'
+
+    @property
+    def nvr(self):
+        return f'{self.name}-{self.version}-{self.release}'
+
+    @property
+    def vr(self):
+        return f'{self.version}-{self.release}'
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: "{self.nevra}">'

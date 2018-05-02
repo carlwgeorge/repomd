@@ -33,6 +33,16 @@ def empty_repo(mock_urlopen):
     return repomd.Repo('https://example.com')
 
 
+@pytest.fixture
+def chicken(repo):
+    return repo.find('chicken')
+
+
+@pytest.fixture
+def brisket(repo):
+    return repo.find('brisket')
+
+
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
     assert isinstance(repo._metadata, etree._Element)
@@ -58,3 +68,37 @@ def test_repo_str(repo):
 def test_repo_len(repo, empty_repo):
     assert len(repo) == 5
     assert len(empty_repo) == 0
+
+
+def test_find(repo):
+    package = repo.find('non-existent')
+    assert package is None
+    package = repo.find('chicken')
+    assert isinstance(package, repomd.Package)
+
+
+def test_findall(repo):
+    packages = repo.findall('non-existent')
+    assert packages == []
+    packages = repo.findall('chicken')
+    assert any(packages)
+    for package in packages:
+        assert isinstance(package, repomd.Package)
+
+
+def test_package(chicken):
+    assert repr(chicken) == '<Package: "chicken-2.2.10-1.fc27.noarch">'
+    assert chicken.name == 'chicken'
+    assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
+    assert chicken.nevr == 'chicken-2.2.10-1.fc27'
+    assert chicken.nvr == 'chicken-2.2.10-1.fc27'
+    assert chicken.vr == '2.2.10-1.fc27'
+
+
+def test_package_with_epoch(brisket):
+    assert repr(brisket) == '<Package: "brisket-1:5.1.1-1.fc27.noarch">'
+    assert brisket.name == 'brisket'
+    assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
+    assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
+    assert brisket.nvr == 'brisket-5.1.1-1.fc27'
+    assert brisket.vr == '5.1.1-1.fc27'
