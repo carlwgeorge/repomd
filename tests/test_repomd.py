@@ -35,14 +35,20 @@ def empty_repo(mock_urlopen):
 
 def test_repo_init(repo):
     assert repo.baseurl == 'https://example.com'
-    assert repr(repo) == '<Repo: "https://example.com">'
-    assert str(repo) == 'https://example.com'
     assert isinstance(repo._metadata, etree._Element)
 
 
 def test_repo_init_lazy(lazy_repo):
     assert lazy_repo.baseurl == 'https://example.com'
     assert lazy_repo._metadata is None
+
+
+def test_repo_repr(repo):
+    assert repr(repo) == '<Repo: "https://example.com">'
+
+
+def test_repo_str(repo):
+    assert str(repo) == 'https://example.com'
 
 
 def test_repo_len(repo, empty_repo):
