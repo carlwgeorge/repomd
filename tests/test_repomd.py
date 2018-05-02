@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-import lxml
+from lxml import etree
 
 import repomd
 
@@ -37,7 +37,7 @@ def test_repo_init(repo):
     assert repo.baseurl == 'https://example.com'
     assert repr(repo) == '<Repo: "https://example.com">'
     assert str(repo) == 'https://example.com'
-    assert isinstance(repo._metadata, lxml.etree._Element)
+    assert isinstance(repo._metadata, etree._Element)
 
 
 def test_repo_init_lazy(lazy_repo):
