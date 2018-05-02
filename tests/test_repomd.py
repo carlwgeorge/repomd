@@ -33,14 +33,18 @@ def empty_repo(mock_urlopen):
     return repomd.Repo('https://example.com')
 
 
-def test_repo_init(repo):
+def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
     assert isinstance(repo._metadata, etree._Element)
 
 
-def test_repo_init_lazy(lazy_repo):
+def test_lazy_repo(lazy_repo):
     assert lazy_repo.baseurl == 'https://example.com'
     assert lazy_repo._metadata is None
+    with mock.patch('repomd.urlopen') as mock_urlopen:
+        mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
+        lazy_repo.load()
+    assert isinstance(lazy_repo._metadata, etree._Element)
 
 
 def test_repo_repr(repo):
