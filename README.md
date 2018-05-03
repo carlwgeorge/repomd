@@ -46,3 +46,14 @@ Find all packages.
 >>> repo.findall('openssl-libs')
 [<Package: "openssl-libs-1:1.0.2k-8.el7.i686">, <Package: "openssl-libs-1:1.0.2k-8.el7.x86_64">]
 ```
+
+Iterate through packages in the repo.
+
+```python
+>>> for package in repo:
+...     print(package.name)
+389-ds-base
+389-ds-base-devel
+389-ds-base-libs
+(and so on)
+```

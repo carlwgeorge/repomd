@@ -86,6 +86,11 @@ def test_findall(repo):
         assert isinstance(package, repomd.Package)
 
 
+def test_iter(repo):
+    for package in repo:
+        assert isinstance(package, repomd.Package)
+
+
 def test_package(chicken):
     assert repr(chicken) == '<Package: "chicken-2.2.10-1.fc27.noarch">'
     assert chicken.name == 'chicken'

@@ -45,6 +45,10 @@ class Repo:
     def __len__(self):
         return int(self._metadata.get('packages'))
 
+    def __iter__(self):
+        for element in self._metadata:
+            yield Package(element)
+
     def find(self, name):
         results = self._metadata.findall(f'common:package[common:name="{name}"]', namespaces=_ns)
         if results:
