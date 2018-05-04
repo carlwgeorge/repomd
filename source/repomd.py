@@ -5,6 +5,8 @@ from io import BytesIO
 from urllib.request import urlopen
 from lxml import etree
 
+from rpm import labelCompare
+
 
 _ns = {
     'common': 'http://linux.duke.edu/metadata/common',
@@ -128,3 +130,6 @@ class Package:
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.nevra}">'
+
+    def __cmp__(self, other):
+        return labelCompare((self.epoch, self.version, self.release), (other.epoch, other.version, other.release))
