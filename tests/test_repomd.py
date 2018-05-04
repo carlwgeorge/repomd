@@ -107,3 +107,15 @@ def test_package_with_epoch(brisket):
     assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nvr == 'brisket-5.1.1-1.fc27'
     assert brisket.vr == '5.1.1-1.fc27'
+
+
+@pytest.mark.parametrize('attr', repomd.Package.__slots__)
+def test_package_attrs_cannot_be_changed(brisket, attr):
+    with pytest.raises(AttributeError):
+        setattr(brisket, attr, 'new value')
+
+
+@pytest.mark.parametrize('attr', repomd.Package.__slots__)
+def test_package_attrs_cannot_be_deleted(brisket, attr):
+    with pytest.raises(AttributeError):
+        delattr(brisket, attr)

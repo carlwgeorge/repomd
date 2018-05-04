@@ -64,6 +64,7 @@ class Repo:
 
 
 class Package:
+    """One package from a repository. Immutable."""
     __slots__ = [
         'name',
         'arch',
@@ -85,24 +86,26 @@ class Package:
         find = partial(element.find, namespaces=_ns)
         findtext = partial(element.findtext, namespaces=_ns)
 
-        self.name = findtext('common:name')
-        self.arch = findtext('common:arch')
-        self.summary = findtext('common:summary')
-        self.description = findtext('common:description')
-        self.packager = findtext('common:packager')
-        self.url = findtext('common:url')
-        self.license = findtext('common:format/rpm:license')
-        self.vendor = findtext('common:format/rpm:vendor')
-        self.sourcerpm = findtext('common:format/rpm:sourcerpm')
+        for attr in 'name', 'arch', 'summary', 'description', 'packager', 'url':
+            super().__setattr__(attr, findtext(f'common:{attr}'))
 
-        self.epoch = find('common:version').get('epoch')
-        self.version = find('common:version').get('ver')
-        self.release = find('common:version').get('rel')
+        for attr in 'license', 'vendor', 'sourcerpm':
+            super().__setattr__(attr, findtext(f'common:format/rpm:{attr}'))
+
+        version = find('common:version')
+        super().__setattr__('epoch', version.get('epoch'))
+        super().__setattr__('version', version.get('ver'))
+        super().__setattr__('release', version.get('rel'))
 
         build_time = find('common:time').get('build')
-        self.build_time = datetime.fromtimestamp(int(build_time))
+        super().__setattr__('build_time', datetime.fromtimestamp(int(build_time)))
 
-        self.location = find('common:location').get('href')
+        super().__setattr__('location', find('common:location').get('href'))
+
+    def __setattr__(self, *_):
+        raise AttributeError(f'{self.__class__.__name__} instanses are read-only')
+
+    __delattr__ = __setattr__
 
     @property
     def nevra(self):
