@@ -107,9 +107,21 @@ class Package:
 
     __delattr__ = __setattr__
 
+    def __copy__(self):
+        # default copy stops working with our __setattr__
+        cls = type(self)
+        c = cls.__new__(cls)
+        for attr in cls.__slots__:
+            object.__setattr__(c, attr, getattr(self, attr))
+        return c
+
     @property
     def nevra(self):
         return f'{self.nevr}.{self.arch}'
+
+    @property
+    def nevra_tuple(self):
+        return self.name, self.epoch, self.version, self.release, self.arch
 
     @property
     def nevr(self):
@@ -128,3 +140,9 @@ class Package:
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.nevra}">'
+
+    def __eq__(self, other):
+        return self.nevra_tuple == other.nevra_tuple
+
+    def __hash__(self):
+        return hash(self.nevra_tuple)

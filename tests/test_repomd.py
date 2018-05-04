@@ -1,3 +1,4 @@
+import copy
 from unittest import mock
 
 import pytest
@@ -94,6 +95,7 @@ def test_iter(repo):
 def test_package(chicken):
     assert repr(chicken) == '<Package: "chicken-2.2.10-1.fc27.noarch">'
     assert chicken.name == 'chicken'
+    assert chicken.epoch == '0'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
     assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nvr == 'chicken-2.2.10-1.fc27'
@@ -103,6 +105,7 @@ def test_package(chicken):
 def test_package_with_epoch(brisket):
     assert repr(brisket) == '<Package: "brisket-1:5.1.1-1.fc27.noarch">'
     assert brisket.name == 'brisket'
+    assert brisket.epoch == '1'
     assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
     assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nvr == 'brisket-5.1.1-1.fc27'
@@ -119,3 +122,23 @@ def test_package_attrs_cannot_be_changed(brisket, attr):
 def test_package_attrs_cannot_be_deleted(brisket, attr):
     with pytest.raises(AttributeError):
         delattr(brisket, attr)
+
+
+def test_package_equals_its_copy(chicken):
+    copied = copy.copy(chicken)
+    assert chicken is chicken
+    assert chicken == chicken
+    assert chicken is not copied
+    assert chicken == copied
+
+
+def test_packages_can_be_used_as_dict_keys(chicken, brisket):
+    d = {chicken: 'chicken', brisket: 'brisket'}
+    copied = copy.copy(chicken)
+    assert d[copied] == 'chicken'
+
+
+def test_equal_packages_work_in_set(chicken, brisket):
+    copied_chicken = copy.copy(chicken)
+    copied_brisket = copy.copy(brisket)
+    assert len({chicken, brisket, copied_chicken, copied_brisket}) == 2
