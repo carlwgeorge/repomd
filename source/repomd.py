@@ -14,6 +14,8 @@ _ns = {
 
 
 class Repo:
+    """A dnf/yum repository."""
+
     __slots__ = ['baseurl', '_metadata']
 
     def __init__(self, baseurl, lazy=False):
@@ -64,7 +66,8 @@ class Repo:
 
 
 class Package:
-    """One package from a repository. Immutable."""
+    """An RPM package from a repository."""
+
     __slots__ = [
         'name',
         'arch',
