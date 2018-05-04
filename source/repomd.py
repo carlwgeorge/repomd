@@ -106,7 +106,7 @@ class Package:
         super().__setattr__('location', find('common:location').get('href'))
 
     def __setattr__(self, *_):
-        raise AttributeError(f'{self.__class__.__name__} instanses are read-only')
+        raise AttributeError(f'{self.__class__.__name__} instances are read-only')
 
     __delattr__ = __setattr__
 
