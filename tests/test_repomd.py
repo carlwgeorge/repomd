@@ -1,4 +1,4 @@
-import copy
+from copy import copy
 from unittest import mock
 
 import pytest
@@ -125,7 +125,7 @@ def test_package_attrs_cannot_be_deleted(brisket, attr):
 
 
 def test_package_equals_its_copy(chicken):
-    copied = copy.copy(chicken)
+    copied = copy(chicken)
     assert chicken is chicken
     assert chicken == chicken
     assert chicken is not copied
@@ -134,11 +134,11 @@ def test_package_equals_its_copy(chicken):
 
 def test_packages_can_be_used_as_dict_keys(chicken, brisket):
     d = {chicken: 'chicken', brisket: 'brisket'}
-    copied = copy.copy(chicken)
+    copied = copy(chicken)
     assert d[copied] == 'chicken'
 
 
 def test_equal_packages_work_in_set(chicken, brisket):
-    copied_chicken = copy.copy(chicken)
-    copied_brisket = copy.copy(brisket)
+    copied_chicken = copy(chicken)
+    copied_brisket = copy(brisket)
     assert len({chicken, brisket, copied_chicken, copied_brisket}) == 2
