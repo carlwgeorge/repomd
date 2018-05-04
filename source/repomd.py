@@ -1,5 +1,5 @@
+from copy import deepcopy
 from datetime import datetime
-from functools import partial
 from gzip import GzipFile
 from io import BytesIO
 from urllib.request import urlopen
@@ -68,55 +68,67 @@ class Repo:
 class Package:
     """An RPM package from a repository."""
 
-    __slots__ = [
-        'name',
-        'arch',
-        'summary',
-        'description',
-        'packager',
-        'url',
-        'license',
-        'vendor',
-        'sourcerpm',
-        'epoch',
-        'version',
-        'release',
-        'build_time',
-        'location',
-    ]
+    __slots__ = ['_element']
 
     def __init__(self, element):
-        find = partial(element.find, namespaces=_ns)
-        findtext = partial(element.findtext, namespaces=_ns)
+        self._element = deepcopy(element)
 
-        for attr in 'name', 'arch', 'summary', 'description', 'packager', 'url':
-            super().__setattr__(attr, findtext(f'common:{attr}'))
+    @property
+    def name(self):
+        return self._element.findtext(f'common:name', namespaces=_ns)
 
-        for attr in 'license', 'vendor', 'sourcerpm':
-            super().__setattr__(attr, findtext(f'common:format/rpm:{attr}'))
+    @property
+    def arch(self):
+        return self._element.findtext(f'common:arch', namespaces=_ns)
 
-        version = find('common:version')
-        super().__setattr__('epoch', version.get('epoch'))
-        super().__setattr__('version', version.get('ver'))
-        super().__setattr__('release', version.get('rel'))
+    @property
+    def summary(self):
+        return self._element.findtext(f'common:summary', namespaces=_ns)
 
-        build_time = find('common:time').get('build')
-        super().__setattr__('build_time', datetime.fromtimestamp(int(build_time)))
+    @property
+    def description(self):
+        return self._element.findtext(f'common:description', namespaces=_ns)
 
-        super().__setattr__('location', find('common:location').get('href'))
+    @property
+    def packager(self):
+        return self._element.findtext(f'common:packager', namespaces=_ns)
 
-    def __setattr__(self, *_):
-        raise AttributeError(f'{self.__class__.__name__} instances are read-only')
+    @property
+    def url(self):
+        return self._element.findtext(f'common:url', namespaces=_ns)
 
-    __delattr__ = __setattr__
+    @property
+    def license(self):
+        return self._element.findtext(f'common:format/rpm:license', namespaces=_ns)
 
-    def __copy__(self):
-        # default copy stops working with our __setattr__
-        cls = type(self)
-        c = cls.__new__(cls)
-        for attr in cls.__slots__:
-            object.__setattr__(c, attr, getattr(self, attr))
-        return c
+    @property
+    def vendor(self):
+        return self._element.findtext(f'common:format/rpm:vendor', namespaces=_ns)
+
+    @property
+    def sourcerpm(self):
+        return self._element.findtext(f'common:format/rpm:sourcerpm', namespaces=_ns)
+
+    @property
+    def epoch(self):
+        return self._element.find('common:version', namespaces=_ns).get('epoch')
+
+    @property
+    def version(self):
+        return self._element.find('common:version', namespaces=_ns).get('ver')
+
+    @property
+    def release(self):
+        return self._element.find('common:version', namespaces=_ns).get('rel')
+
+    @property
+    def build_time(self):
+        build_time = self._element.find('common:time', namespaces=_ns).get('build')
+        return datetime.fromtimestamp(int(build_time))
+
+    @property
+    def location(self):
+        return self._element.find('common:location', namespaces=_ns).get('href')
 
     @property
     def nevra(self):

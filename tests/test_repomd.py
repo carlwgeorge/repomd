@@ -1,4 +1,5 @@
 from copy import copy
+from datetime import datetime
 from unittest import mock
 
 import pytest
@@ -95,8 +96,21 @@ def test_iter(repo):
 def test_package(chicken):
     assert repr(chicken) == '<Package: "chicken-2.2.10-1.fc27.noarch">'
     assert chicken.name == 'chicken'
+    assert chicken.arch == 'noarch'
+    assert chicken.summary == 'Chicken'
+    assert chicken.description == 'Chicken.'
+    assert chicken.packager == 'Carl'
+    assert chicken.url == 'https://example.com/chicken'
+    assert chicken.license == 'BBQ'
+    assert chicken.vendor == "Carl's BBQ"
+    assert chicken.sourcerpm == 'chicken-2.2.10-1.fc27.src.rpm'
     assert chicken.epoch == '0'
+    assert chicken.version == '2.2.10'
+    assert chicken.release == '1.fc27'
+    assert chicken.build_time == datetime.fromtimestamp(1525208602)
+    assert chicken.location == 'chicken-2.2.10-1.fc27.noarch.rpm'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
+    assert chicken.nevra_tuple == ('chicken', '0', '2.2.10', '1.fc27', 'noarch')
     assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nvr == 'chicken-2.2.10-1.fc27'
     assert chicken.vr == '2.2.10-1.fc27'
@@ -105,23 +119,24 @@ def test_package(chicken):
 def test_package_with_epoch(brisket):
     assert repr(brisket) == '<Package: "brisket-1:5.1.1-1.fc27.noarch">'
     assert brisket.name == 'brisket'
+    assert brisket.arch == 'noarch'
+    assert brisket.summary == 'Brisket'
+    assert brisket.description == 'Brisket.'
+    assert brisket.packager == 'Carl'
+    assert brisket.url == 'https://example.com/brisket'
+    assert brisket.license == 'BBQ'
+    assert brisket.vendor == "Carl's BBQ"
+    assert brisket.sourcerpm == 'brisket-5.1.1-1.fc27.src.rpm'
     assert brisket.epoch == '1'
+    assert brisket.version == '5.1.1'
+    assert brisket.release == '1.fc27'
+    assert brisket.build_time == datetime.fromtimestamp(1525208602)
+    assert brisket.location == 'brisket-5.1.1-1.fc27.noarch.rpm'
     assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
+    assert brisket.nevra_tuple == ('brisket', '1', '5.1.1', '1.fc27', 'noarch')
     assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nvr == 'brisket-5.1.1-1.fc27'
     assert brisket.vr == '5.1.1-1.fc27'
-
-
-@pytest.mark.parametrize('attr', repomd.Package.__slots__)
-def test_package_attrs_cannot_be_changed(brisket, attr):
-    with pytest.raises(AttributeError):
-        setattr(brisket, attr, 'new value')
-
-
-@pytest.mark.parametrize('attr', repomd.Package.__slots__)
-def test_package_attrs_cannot_be_deleted(brisket, attr):
-    with pytest.raises(AttributeError):
-        delattr(brisket, attr)
 
 
 def test_package_equals_its_copy(chicken):
