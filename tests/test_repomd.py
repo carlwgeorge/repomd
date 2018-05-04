@@ -125,17 +125,17 @@ def test_package_attrs_cannot_be_deleted(brisket, attr):
 
 
 def test_package_equals_its_copy(chicken):
-    copied = copy(chicken)
+    copied_chicken = copy(chicken)
     assert chicken is chicken
     assert chicken == chicken
-    assert chicken is not copied
-    assert chicken == copied
+    assert chicken is not copied_chicken
+    assert chicken == copied_chicken
 
 
 def test_packages_can_be_used_as_dict_keys(chicken, brisket):
     d = {chicken: 'chicken', brisket: 'brisket'}
-    copied = copy(chicken)
-    assert d[copied] == 'chicken'
+    copied_chicken = copy(chicken)
+    assert d[copied_chicken] == 'chicken'
 
 
 def test_equal_packages_work_in_set(chicken, brisket):
