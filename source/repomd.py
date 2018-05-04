@@ -106,10 +106,7 @@ class Package:
 
     @property
     def nevra(self):
-        if int(self.epoch):
-            return f'{self.name}-{self.epoch}:{self.version}-{self.release}.{self.arch}'
-        else:
-            return f'{self.name}-{self.version}-{self.release}.{self.arch}'
+        return f'{self.nevr}.{self.arch}'
 
     @property
     def nevr(self):
