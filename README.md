@@ -7,26 +7,16 @@ This library provides an object-oriented interface to get information out of dnf
 
 ## Usage
 
-Import the Repo class from the module.
-
 ```python
->>> from repomd import Repo
+>>> import repomd
+
+>>> repo = repomd.load('http://mirror.centos.org/centos/7/os/x86_64')
+
+>>> repo
+<Repo: "http://mirror.centos.org/centos/7/os/x86_64">
 ```
 
-Create a repo instance from the baseurl of the repo.
-
-```python
->>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64')
-```
-
-Optionally, you can delay loading of the repo metadata.
-
-```python
->>> repo = Repo('http://mirror.centos.org/centos/7/os/x86_64', lazy=True)
->>> repo.load()
-```
-
-The length of the repo object indicates the number of packages in the repo.
+The length of the `Repo` object indicates the number of packages in the repo.
 
 ```python
 >>> len(repo)

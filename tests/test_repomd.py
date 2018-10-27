@@ -20,19 +20,14 @@ def load_repodata(path):
 @mock.patch('repomd.urlopen')
 def repo(mock_urlopen):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
-    return repomd.Repo('https://example.com')
-
-
-@pytest.fixture
-def lazy_repo():
-    return repomd.Repo('https://example.com', lazy=True)
+    return repomd.load('https://example.com')
 
 
 @pytest.fixture
 @mock.patch('repomd.urlopen')
 def empty_repo(mock_urlopen):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/empty_repo/repodata')
-    return repomd.Repo('https://example.com')
+    return repomd.load('https://example.com')
 
 
 @pytest.fixture
@@ -48,15 +43,6 @@ def brisket(repo):
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
     assert isinstance(repo._metadata, etree._Element)
-
-
-def test_lazy_repo(lazy_repo):
-    assert lazy_repo.baseurl == 'https://example.com'
-    assert lazy_repo._metadata is None
-    with mock.patch('repomd.urlopen') as mock_urlopen:
-        mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
-        lazy_repo.load()
-    assert isinstance(lazy_repo._metadata, etree._Element)
 
 
 def test_repo_repr(repo):

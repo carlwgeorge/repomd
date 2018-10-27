@@ -13,30 +13,31 @@ _ns = {
 }
 
 
+def load(baseurl):
+    # download and parse repomd.xml
+    with urlopen(f'{baseurl}/repodata/repomd.xml') as response:
+        repomd_xml = etree.fromstring(response.read())
+
+    # determine the location of *primary.xml.gz
+    location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
+
+    # download and parse *-primary.xml
+    with urlopen(f'{baseurl}/{location}') as response:
+        with BytesIO(response.read()) as compressed:
+            with GzipFile(fileobj=compressed) as uncompressed:
+                metadata = etree.fromstring(uncompressed.read())
+
+    return Repo(baseurl, metadata)
+
+
 class Repo:
     """A dnf/yum repository."""
 
     __slots__ = ['baseurl', '_metadata']
 
-    def __init__(self, baseurl, lazy=False):
+    def __init__(self, baseurl, metadata):
         self.baseurl = baseurl
-        self._metadata = None
-        if not lazy:
-            self.load()
-
-    def load(self):
-        # download and parse repomd.xml
-        with urlopen(f'{self.baseurl}/repodata/repomd.xml') as response:
-            repomd_xml = etree.fromstring(response.read())
-
-        # determine the location of *primary.xml.gz
-        location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
-
-        # download and parse *-primary.xml
-        with urlopen(f'{self.baseurl}/{location}') as response:
-            with BytesIO(response.read()) as compressed:
-                with GzipFile(fileobj=compressed) as uncompressed:
-                    self._metadata = etree.fromstring(uncompressed.read())
+        self._metadata = metadata
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.baseurl}">'
