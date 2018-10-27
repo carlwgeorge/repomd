@@ -16,7 +16,7 @@ This library provides an object-oriented interface to get information out of dnf
 <Repo: "https://mirror.rackspace.com/centos/7/updates/x86_64/">
 ```
 
-The length of the `Repo` object indicates the number of packages in the repo.
+The length of the `Repo` object indicates the number of packages in the repository.
 
 ```python
 >>> len(repo)
@@ -37,7 +37,7 @@ Find all packages of a given name.
 [<Package: "systemd-219-57.el7_5.1.x86_64">, <Package: "systemd-219-57.el7_5.3.x86_64">]
 ```
 
-Iterate through packages in the repo.
+Iterate through packages in the repository.
 
 ```python
 >>> for package in repo:
