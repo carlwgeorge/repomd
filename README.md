@@ -10,40 +10,40 @@ This library provides an object-oriented interface to get information out of dnf
 ```python
 >>> import repomd
 
->>> repo = repomd.load('http://mirror.centos.org/centos/7/os/x86_64')
+>>> repo = repomd.load('https://mirror.rackspace.com/centos/7/updates/x86_64/')
 
 >>> repo
-<Repo: "http://mirror.centos.org/centos/7/os/x86_64">
+<Repo: "https://mirror.rackspace.com/centos/7/updates/x86_64/">
 ```
 
 The length of the `Repo` object indicates the number of packages in the repo.
 
 ```python
 >>> len(repo)
-9591
+1602
 ```
 
-Find a package.
+Find a package by name.
 
 ```python
->>> repo.find('openssl-libs')
-<Package: "openssl-libs-1:1.0.2k-8.el7.x86_64">
+>>> repo.find('systemd')
+<Package: "systemd-219-57.el7_5.3.x86_64">
 ```
 
-Find all packages.
+Find all packages of a given name.
 
 ```python
->>> repo.findall('openssl-libs')
-[<Package: "openssl-libs-1:1.0.2k-8.el7.i686">, <Package: "openssl-libs-1:1.0.2k-8.el7.x86_64">]
+>>> repo.findall('systemd')
+[<Package: "systemd-219-57.el7_5.1.x86_64">, <Package: "systemd-219-57.el7_5.3.x86_64">]
 ```
 
 Iterate through packages in the repo.
 
 ```python
 >>> for package in repo:
-...     print(package.name)
-389-ds-base
-389-ds-base-devel
-389-ds-base-libs
+...     print(package.nvr)
+389-ds-base-1.3.7.5-19.el7_5
+389-ds-base-1.3.7.5-21.el7_5
+389-ds-base-1.3.7.5-24.el7_5
 (and so on)
 ```
