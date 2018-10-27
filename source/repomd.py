@@ -111,6 +111,15 @@ class Package:
         return self._element.findtext(f'common:format/rpm:sourcerpm', namespaces=_ns)
 
     @property
+    def build_time(self):
+        build_time = self._element.find('common:time', namespaces=_ns).get('build')
+        return datetime.fromtimestamp(int(build_time))
+
+    @property
+    def location(self):
+        return self._element.find('common:location', namespaces=_ns).get('href')
+
+    @property
     def epoch(self):
         return self._element.find('common:version', namespaces=_ns).get('epoch')
 
@@ -123,21 +132,13 @@ class Package:
         return self._element.find('common:version', namespaces=_ns).get('rel')
 
     @property
-    def build_time(self):
-        build_time = self._element.find('common:time', namespaces=_ns).get('build')
-        return datetime.fromtimestamp(int(build_time))
+    def vr(self):
+        return f'{self.version}-{self.release}'
 
     @property
-    def location(self):
-        return self._element.find('common:location', namespaces=_ns).get('href')
+    def nvr(self):
+        return f'{self.name}-{self.version}-{self.release}'
 
-    @property
-    def nevra(self):
-        return f'{self.nevr}.{self.arch}'
-
-    @property
-    def nevra_tuple(self):
-        return self.name, self.epoch, self.version, self.release, self.arch
 
     @property
     def nevr(self):
@@ -147,18 +148,18 @@ class Package:
             return f'{self.name}-{self.version}-{self.release}'
 
     @property
-    def nvr(self):
-        return f'{self.name}-{self.version}-{self.release}'
+    def nevra(self):
+        return f'{self.nevr}.{self.arch}'
 
     @property
-    def vr(self):
-        return f'{self.version}-{self.release}'
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}: "{self.nevra}">'
+    def nevra_tuple(self):
+        return self.name, self.epoch, self.version, self.release, self.arch
 
     def __eq__(self, other):
         return self.nevra_tuple == other.nevra_tuple
 
     def __hash__(self):
         return hash(self.nevra_tuple)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}: "{self.nevra}">'

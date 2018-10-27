@@ -90,16 +90,16 @@ def test_package(chicken):
     assert chicken.license == 'BBQ'
     assert chicken.vendor == "Carl's BBQ"
     assert chicken.sourcerpm == 'chicken-2.2.10-1.fc27.src.rpm'
+    assert chicken.build_time == datetime.fromtimestamp(1525208602)
+    assert chicken.location == 'chicken-2.2.10-1.fc27.noarch.rpm'
     assert chicken.epoch == '0'
     assert chicken.version == '2.2.10'
     assert chicken.release == '1.fc27'
-    assert chicken.build_time == datetime.fromtimestamp(1525208602)
-    assert chicken.location == 'chicken-2.2.10-1.fc27.noarch.rpm'
+    assert chicken.vr == '2.2.10-1.fc27'
+    assert chicken.nvr == 'chicken-2.2.10-1.fc27'
+    assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
     assert chicken.nevra_tuple == ('chicken', '0', '2.2.10', '1.fc27', 'noarch')
-    assert chicken.nevr == 'chicken-2.2.10-1.fc27'
-    assert chicken.nvr == 'chicken-2.2.10-1.fc27'
-    assert chicken.vr == '2.2.10-1.fc27'
 
 
 def test_package_with_epoch(brisket):
@@ -113,16 +113,16 @@ def test_package_with_epoch(brisket):
     assert brisket.license == 'BBQ'
     assert brisket.vendor == "Carl's BBQ"
     assert brisket.sourcerpm == 'brisket-5.1.1-1.fc27.src.rpm'
+    assert brisket.build_time == datetime.fromtimestamp(1525208602)
+    assert brisket.location == 'brisket-5.1.1-1.fc27.noarch.rpm'
     assert brisket.epoch == '1'
     assert brisket.version == '5.1.1'
     assert brisket.release == '1.fc27'
-    assert brisket.build_time == datetime.fromtimestamp(1525208602)
-    assert brisket.location == 'brisket-5.1.1-1.fc27.noarch.rpm'
+    assert brisket.vr == '5.1.1-1.fc27'
+    assert brisket.nvr == 'brisket-5.1.1-1.fc27'
+    assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
     assert brisket.nevra_tuple == ('brisket', '1', '5.1.1', '1.fc27', 'noarch')
-    assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
-    assert brisket.nvr == 'brisket-5.1.1-1.fc27'
-    assert brisket.vr == '5.1.1-1.fc27'
 
 
 def test_package_equals_its_copy(chicken):
