@@ -97,6 +97,7 @@ def test_package(chicken):
     assert chicken.release == '1.fc27'
     assert chicken.vr == '2.2.10-1.fc27'
     assert chicken.nvr == 'chicken-2.2.10-1.fc27'
+    assert chicken.evr == '2.2.10-1.fc27'
     assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
     assert chicken.nevra_tuple == ('chicken', '0', '2.2.10', '1.fc27', 'noarch')
@@ -120,6 +121,7 @@ def test_package_with_epoch(brisket):
     assert brisket.release == '1.fc27'
     assert brisket.vr == '5.1.1-1.fc27'
     assert brisket.nvr == 'brisket-5.1.1-1.fc27'
+    assert brisket.evr == '1:5.1.1-1.fc27'
     assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
     assert brisket.nevra_tuple == ('brisket', '1', '5.1.1', '1.fc27', 'noarch')

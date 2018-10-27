@@ -120,32 +120,46 @@ class Package:
         return self._element.find('common:location', namespaces=_ns).get('href')
 
     @property
+    def _version_info(self):
+        return self._element.find('common:version', namespaces=_ns)
+
+    @property
     def epoch(self):
-        return self._element.find('common:version', namespaces=_ns).get('epoch')
+        return self._version_info.get('epoch')
 
     @property
     def version(self):
-        return self._element.find('common:version', namespaces=_ns).get('ver')
+        return self._version_info.get('ver')
 
     @property
     def release(self):
-        return self._element.find('common:version', namespaces=_ns).get('rel')
+        return self._version_info.get('rel')
 
     @property
     def vr(self):
-        return f'{self.version}-{self.release}'
+        version_info = self._version_info
+        v = version_info.get('ver')
+        r = version_info.get('rel')
+        return f'{v}-{r}'
 
     @property
     def nvr(self):
-        return f'{self.name}-{self.version}-{self.release}'
+        return f'{self.name}-{self.vr}'
 
+    @property
+    def evr(self):
+        version_info = self._version_info
+        e = version_info.get('epoch')
+        v = version_info.get('ver')
+        r = version_info.get('rel')
+        if int(e):
+            return f'{e}:{v}-{r}'
+        else:
+            return f'{v}-{r}'
 
     @property
     def nevr(self):
-        if int(self.epoch):
-            return f'{self.name}-{self.epoch}:{self.version}-{self.release}'
-        else:
-            return f'{self.name}-{self.version}-{self.release}'
+        return f'{self.name}-{self.evr}'
 
     @property
     def nevra(self):
