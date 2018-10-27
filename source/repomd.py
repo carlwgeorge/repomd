@@ -166,14 +166,14 @@ class Package:
         return f'{self.nevr}.{self.arch}'
 
     @property
-    def nevra_tuple(self):
+    def _nevra_tuple(self):
         return self.name, self.epoch, self.version, self.release, self.arch
 
     def __eq__(self, other):
-        return self.nevra_tuple == other.nevra_tuple
+        return self._nevra_tuple == other._nevra_tuple
 
     def __hash__(self):
-        return hash(self.nevra_tuple)
+        return hash(self._nevra_tuple)
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.nevra}">'
