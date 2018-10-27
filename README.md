@@ -37,6 +37,24 @@ Find all packages of a given name.
 [<Package: "systemd-219-57.el7_5.1.x86_64">, <Package: "systemd-219-57.el7_5.3.x86_64">]
 ```
 
+A `Package` instance has many useful properties.
+
+```python
+>>> package = repo.find('systemd')
+
+>>> package.name
+'systemd'
+
+>>> package.version
+'219'
+
+>>> package.build_time
+datetime.datetime(2018, 9, 26, 14, 11, 37)
+
+>>> package.nevr
+'systemd-219-57.el7_5.3'
+```
+
 Iterate through packages in the repository.
 
 ```python
