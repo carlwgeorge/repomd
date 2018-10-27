@@ -40,6 +40,11 @@ def brisket(repo):
     return repo.find('brisket')
 
 
+@pytest.fixture
+def pork_ribs(repo):
+    return repo.find('pork-ribs')
+
+
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
     assert isinstance(repo._metadata, etree._Element)
@@ -123,6 +128,29 @@ def test_package_with_epoch(brisket):
     assert brisket.evr == '1:5.1.1-1.fc27'
     assert brisket.nevr == 'brisket-1:5.1.1-1.fc27'
     assert brisket.nevra == 'brisket-1:5.1.1-1.fc27.noarch'
+
+
+def test_subpackage(pork_ribs):
+    assert repr(pork_ribs) == '<Package: "pork-ribs-3.2.0-1.fc27.noarch">'
+    assert pork_ribs.name == 'pork-ribs'
+    assert pork_ribs.arch == 'noarch'
+    assert pork_ribs.summary == 'Pork ribs'
+    assert pork_ribs.description == 'Pork ribs.'
+    assert pork_ribs.packager == 'Carl'
+    assert pork_ribs.url == 'https://example.com/ribs'
+    assert pork_ribs.license == 'BBQ'
+    assert pork_ribs.vendor == "Carl's BBQ"
+    assert pork_ribs.sourcerpm == 'ribs-3.2.0-1.fc27.src.rpm'
+    assert pork_ribs.build_time == datetime.fromtimestamp(1525208603)
+    assert pork_ribs.location == 'pork-ribs-3.2.0-1.fc27.noarch.rpm'
+    assert pork_ribs.epoch == '0'
+    assert pork_ribs.version == '3.2.0'
+    assert pork_ribs.release == '1.fc27'
+    assert pork_ribs.vr == '3.2.0-1.fc27'
+    assert pork_ribs.nvr == 'pork-ribs-3.2.0-1.fc27'
+    assert pork_ribs.evr == '3.2.0-1.fc27'
+    assert pork_ribs.nevr == 'pork-ribs-3.2.0-1.fc27'
+    assert pork_ribs.nevra == 'pork-ribs-3.2.0-1.fc27.noarch'
 
 
 def test_package_equals_its_copy(chicken):
