@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from gzip import GzipFile
 from io import BytesIO
@@ -72,7 +71,7 @@ class Package:
     __slots__ = ['_element']
 
     def __init__(self, element):
-        self._element = deepcopy(element)
+        self._element = element
 
     @property
     def name(self):
