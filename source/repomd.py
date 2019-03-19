@@ -2,6 +2,7 @@ import datetime
 import gzip
 import io
 import lxml.etree
+import pathlib
 import urllib.request
 
 
@@ -13,15 +14,17 @@ _ns = {
 
 
 def load(baseurl):
+    base = pathlib.PurePosixPath(baseurl)
+
     # download and parse repomd.xml
-    with urllib.request.urlopen(f'{baseurl}/repodata/repomd.xml') as response:
+    with urllib.request.urlopen(base / 'repodata' / 'repomd.xml') as response:
         repomd_xml = lxml.etree.fromstring(response.read())
 
     # determine the location of *primary.xml.gz
     location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
 
     # download and parse *-primary.xml
-    with urllib.request.urlopen(f'{baseurl}/{location}') as response:
+    with urllib.request.urlopen(base / location) as response:
         with io.BytesIO(response.read()) as compressed:
             with gzip.GzipFile(fileobj=compressed) as uncompressed:
                 metadata = lxml.etree.fromstring(uncompressed.read())
