@@ -1,5 +1,6 @@
 import copy
 import datetime
+import pathlib
 import unittest.mock
 
 import lxml.etree
@@ -8,10 +9,11 @@ import pytest
 import repomd
 
 
-def load_repodata(path):
-    with open(f'{path}/repomd.xml', 'rb') as f:
+def load_test_repodata(base):
+    base = pathlib.Path(base)
+    with (base / 'repodata' / 'repomd.xml').open(mode='rb') as f:
         repomd_xml = f.read()
-    with open(f'{path}/primary.xml.gz', 'rb') as f:
+    with (base / 'repodata' / 'primary.xml.gz').open(mode='rb') as f:
         primary_xml = f.read()
     return (repomd_xml, primary_xml)
 
@@ -19,14 +21,14 @@ def load_repodata(path):
 @pytest.fixture
 @unittest.mock.patch('repomd.urllib.request.urlopen')
 def repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_test_repodata('tests/data/repo')
     return repomd.load('https://example.com')
 
 
 @pytest.fixture
 @unittest.mock.patch('repomd.urllib.request.urlopen')
 def empty_repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/empty_repo/repodata')
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_test_repodata('tests/data/empty_repo')
     return repomd.load('https://example.com')
 
 
