@@ -1,8 +1,8 @@
-from datetime import datetime
-from gzip import GzipFile
-from io import BytesIO
-from urllib.request import urlopen
-from lxml import etree
+import datetime
+import gzip
+import io
+import lxml.etree
+import urllib.request
 
 
 _ns = {
@@ -14,17 +14,17 @@ _ns = {
 
 def load(baseurl):
     # download and parse repomd.xml
-    with urlopen(f'{baseurl}/repodata/repomd.xml') as response:
-        repomd_xml = etree.fromstring(response.read())
+    with urllib.request.urlopen(f'{baseurl}/repodata/repomd.xml') as response:
+        repomd_xml = lxml.etree.fromstring(response.read())
 
     # determine the location of *primary.xml.gz
     location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
 
     # download and parse *-primary.xml
-    with urlopen(f'{baseurl}/{location}') as response:
-        with BytesIO(response.read()) as compressed:
-            with GzipFile(fileobj=compressed) as uncompressed:
-                metadata = etree.fromstring(uncompressed.read())
+    with urllib.request.urlopen(f'{baseurl}/{location}') as response:
+        with io.BytesIO(response.read()) as compressed:
+            with gzip.GzipFile(fileobj=compressed) as uncompressed:
+                metadata = lxml.etree.fromstring(uncompressed.read())
 
     return Repo(baseurl, metadata)
 
@@ -112,7 +112,7 @@ class Package:
     @property
     def build_time(self):
         build_time = self._element.find('common:time', namespaces=_ns).get('build')
-        return datetime.fromtimestamp(int(build_time))
+        return datetime.datetime.fromtimestamp(int(build_time))
 
     @property
     def location(self):

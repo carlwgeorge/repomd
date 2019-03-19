@@ -1,9 +1,9 @@
-from copy import copy
-from datetime import datetime
-from unittest import mock
+import copy
+import datetime
+import unittest.mock
 
+import lxml.etree
 import pytest
-from lxml import etree
 
 import repomd
 
@@ -17,14 +17,14 @@ def load_repodata(path):
 
 
 @pytest.fixture
-@mock.patch('repomd.urlopen')
+@unittest.mock.patch('repomd.urllib.request.urlopen')
 def repo(mock_urlopen):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/repo/repodata')
     return repomd.load('https://example.com')
 
 
 @pytest.fixture
-@mock.patch('repomd.urlopen')
+@unittest.mock.patch('repomd.urllib.request.urlopen')
 def empty_repo(mock_urlopen):
     mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_repodata('tests/data/empty_repo/repodata')
     return repomd.load('https://example.com')
@@ -47,7 +47,7 @@ def pork_ribs(repo):
 
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
-    assert isinstance(repo._metadata, etree._Element)
+    assert isinstance(repo._metadata, lxml.etree._Element)
 
 
 def test_repo_repr(repo):
@@ -95,7 +95,7 @@ def test_package(chicken):
     assert chicken.license == 'BBQ'
     assert chicken.vendor == "Carl's BBQ"
     assert chicken.sourcerpm == 'chicken-2.2.10-1.fc27.src.rpm'
-    assert chicken.build_time == datetime.fromtimestamp(1525208602)
+    assert chicken.build_time == datetime.datetime.fromtimestamp(1525208602)
     assert chicken.location == 'chicken-2.2.10-1.fc27.noarch.rpm'
     assert chicken.epoch == '0'
     assert chicken.version == '2.2.10'
@@ -118,7 +118,7 @@ def test_package_with_epoch(brisket):
     assert brisket.license == 'BBQ'
     assert brisket.vendor == "Carl's BBQ"
     assert brisket.sourcerpm == 'brisket-5.1.1-1.fc27.src.rpm'
-    assert brisket.build_time == datetime.fromtimestamp(1525208602)
+    assert brisket.build_time == datetime.datetime.fromtimestamp(1525208602)
     assert brisket.location == 'brisket-5.1.1-1.fc27.noarch.rpm'
     assert brisket.epoch == '1'
     assert brisket.version == '5.1.1'
@@ -141,7 +141,7 @@ def test_subpackage(pork_ribs):
     assert pork_ribs.license == 'BBQ'
     assert pork_ribs.vendor == "Carl's BBQ"
     assert pork_ribs.sourcerpm == 'ribs-3.2.0-1.fc27.src.rpm'
-    assert pork_ribs.build_time == datetime.fromtimestamp(1525208603)
+    assert pork_ribs.build_time == datetime.datetime.fromtimestamp(1525208603)
     assert pork_ribs.location == 'pork-ribs-3.2.0-1.fc27.noarch.rpm'
     assert pork_ribs.epoch == '0'
     assert pork_ribs.version == '3.2.0'
@@ -154,7 +154,7 @@ def test_subpackage(pork_ribs):
 
 
 def test_package_equals_its_copy(chicken):
-    copied_chicken = copy(chicken)
+    copied_chicken = copy.copy(chicken)
     assert chicken is chicken
     assert chicken == chicken
     assert chicken is not copied_chicken
@@ -163,11 +163,11 @@ def test_package_equals_its_copy(chicken):
 
 def test_packages_can_be_used_as_dict_keys(chicken, brisket):
     d = {chicken: 'chicken', brisket: 'brisket'}
-    copied_chicken = copy(chicken)
+    copied_chicken = copy.copy(chicken)
     assert d[copied_chicken] == 'chicken'
 
 
 def test_equal_packages_work_in_set(chicken, brisket):
-    copied_chicken = copy(chicken)
-    copied_brisket = copy(brisket)
+    copied_chicken = copy.copy(chicken)
+    copied_brisket = copy.copy(brisket)
     assert len({chicken, brisket, copied_chicken, copied_brisket}) == 2
