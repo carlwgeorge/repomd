@@ -45,7 +45,7 @@ class Repo:
         return f'<{self.__class__.__name__}: "{self.baseurl}">'
 
     def __str__(self):
-        return f'{self.baseurl}'
+        return self.baseurl
 
     def __len__(self):
         return int(self._metadata.get('packages'))
@@ -78,39 +78,39 @@ class Package:
 
     @property
     def name(self):
-        return self._element.findtext(f'common:name', namespaces=_ns)
+        return self._element.findtext('common:name', namespaces=_ns)
 
     @property
     def arch(self):
-        return self._element.findtext(f'common:arch', namespaces=_ns)
+        return self._element.findtext('common:arch', namespaces=_ns)
 
     @property
     def summary(self):
-        return self._element.findtext(f'common:summary', namespaces=_ns)
+        return self._element.findtext('common:summary', namespaces=_ns)
 
     @property
     def description(self):
-        return self._element.findtext(f'common:description', namespaces=_ns)
+        return self._element.findtext('common:description', namespaces=_ns)
 
     @property
     def packager(self):
-        return self._element.findtext(f'common:packager', namespaces=_ns)
+        return self._element.findtext('common:packager', namespaces=_ns)
 
     @property
     def url(self):
-        return self._element.findtext(f'common:url', namespaces=_ns)
+        return self._element.findtext('common:url', namespaces=_ns)
 
     @property
     def license(self):
-        return self._element.findtext(f'common:format/rpm:license', namespaces=_ns)
+        return self._element.findtext('common:format/rpm:license', namespaces=_ns)
 
     @property
     def vendor(self):
-        return self._element.findtext(f'common:format/rpm:vendor', namespaces=_ns)
+        return self._element.findtext('common:format/rpm:vendor', namespaces=_ns)
 
     @property
     def sourcerpm(self):
-        return self._element.findtext(f'common:format/rpm:sourcerpm', namespaces=_ns)
+        return self._element.findtext('common:format/rpm:sourcerpm', namespaces=_ns)
 
     @property
     def build_time(self):
