@@ -1,11 +1,13 @@
-from setuptools import setup
+import pathlib
+
+import setuptools
 
 
-with open('README.md') as f:
+with pathlib.Path('README.md').open() as f:
     long_description = f.read()
 
 
-setup(
+setuptools.setup(
     name='repomd',
     version='0.1.0',
     author='Carl George',
