@@ -6,5 +6,5 @@ test_task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: pip freeze
-  install_script: pip install .[tests]
+  install_script: pip install .[test]
   test_script: pytest

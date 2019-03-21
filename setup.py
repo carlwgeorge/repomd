@@ -21,7 +21,7 @@ setup(
     setup_requires=['setuptools>=38.6.0'],
     install_requires=['lxml'],
     extras_require={
-        'tests': [
+        'test': [
             'pytest',
             'pytest-cov',
             'pytest-flake8',
