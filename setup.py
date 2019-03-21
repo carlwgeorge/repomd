@@ -17,7 +17,9 @@ setup(
     license='MIT',
     package_dir={'': 'source'},
     py_modules=['repomd'],
+    # f-strings
     python_requires='>=3.6',
+    # markdown content type
     setup_requires=['setuptools>=38.6.0'],
     install_requires=['lxml'],
     extras_require={
