@@ -19,8 +19,14 @@ setup(
     py_modules=['repomd'],
     python_requires='>=3.6',
     setup_requires=['setuptools>=38.6.0'],
-    tests_require=['pytest'],
     install_requires=['lxml'],
+    extras_require={
+        'tests': [
+            'pytest',
+            'pytest-cov',
+            'pytest-flake8',
+        ],
+    },
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',

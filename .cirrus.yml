@@ -1,0 +1,10 @@
+test_task:
+  container:
+    matrix:
+      image: python:3.6
+      image: python:3.7
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: pip freeze
+  install_script: pip install .[tests]
+  test_script: pytest

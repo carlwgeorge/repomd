@@ -1,5 +1,4 @@
-[![travis-ci.org](https://img.shields.io/travis/carlwgeorge/repomd.svg)](https://travis-ci.org/carlwgeorge/repomd)
-[![codecov.io](https://img.shields.io/codecov/c/github/carlwgeorge/repomd.svg)](https://codecov.io/gh/carlwgeorge/repomd)
+[![build status](https://api.cirrus-ci.com/github/carlwgeorge/repomd.svg)](https://cirrus-ci.com/github/carlwgeorge/repomd/master)
 
 # repomd
 
