@@ -1,7 +1,7 @@
 import datetime
 import gzip
 import io
-import lxml.etree
+import defusedxml.lxml
 import pathlib
 import urllib.request
 
@@ -18,7 +18,7 @@ def load(baseurl):
 
     # download and parse repomd.xml
     with urllib.request.urlopen(base / 'repodata' / 'repomd.xml') as response:
-        repomd_xml = lxml.etree.fromstring(response.read())
+        repomd_xml = defusedxml.lxml.fromstring(response.read())
 
     # determine the location of *primary.xml.gz
     location = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns).get('href')
@@ -27,7 +27,7 @@ def load(baseurl):
     with urllib.request.urlopen(base / location) as response:
         with io.BytesIO(response.read()) as compressed:
             with gzip.GzipFile(fileobj=compressed) as uncompressed:
-                metadata = lxml.etree.fromstring(uncompressed.read())
+                metadata = defusedxml.lxml.fromstring(uncompressed.read())
 
     return Repo(baseurl, metadata)
 

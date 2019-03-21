@@ -23,7 +23,10 @@ setuptools.setup(
     python_requires='>=3.6',
     # markdown content type
     setup_requires=['setuptools>=38.6.0'],
-    install_requires=['lxml'],
+    install_requires=[
+        'defusedxml',
+        'lxml',
+    ],
     extras_require={
         'test': [
             'pytest',
