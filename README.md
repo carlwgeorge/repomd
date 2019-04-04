@@ -1,6 +1,7 @@
-[![build status](https://api.cirrus-ci.com/github/carlwgeorge/repomd.svg)](https://cirrus-ci.com/github/carlwgeorge/repomd/master)
-
 # repomd
+
+[![pypi](https://img.shields.io/pypi/v/repomd.svg)](https://pypi.org/project/repomd/)
+[![build status](https://api.cirrus-ci.com/github/carlwgeorge/repomd.svg)](https://cirrus-ci.com/github/carlwgeorge/repomd/master)
 
 This library provides an object-oriented interface to get information out of dnf/yum repositories.
 
