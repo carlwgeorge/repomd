@@ -19,57 +19,62 @@ _ns = {
 }
 
 
-def get_primary_contents(base, path, repomd_xml, data_type):
-    """Get the repometadata for the type in question.
+class RepoMD():
+    def __init__(self, baseurl):
+        # parse baseurl to allow manipulating the path
+        self.base = urllib.parse.urlparse(baseurl)
+        self.path = pathlib.PurePosixPath(self.base.path)
 
-    Parameters:
-        base - output of urllib.parse.urlparse on a repomd.xml file
-        repomd_xml - defusedxml.lxml.fromstring output of the repomd.xml path
-        data_type - The XML Node to look for, usually 'primary' or 'primary_db'
+        # first we must get the repomd.xml file
+        self.repomd_path = self.path / 'repodata' / 'repomd.xml'
+        self.repomd_url = self.base._replace(path=str(self.repomd_path)).geturl()
+        with urllib.request.urlopen(self.repomd_url) as response:
+            self.repomd_xml = defusedxml.lxml.fromstring(response.read())
 
-    Returns:
-        (bytes) - An uncompressed bytes object from the URL referenced 
-                  in the found xml node.
+    def get_repo_file_url(self, href_name):
+        find_query = 'repo:data[@type="{}"]/repo:location'.format(href_name)
 
-    Common Exceptions:
-        Will raise AttributeError when the DataType is not found
-    """
-    find_query = 'repo:data[@type="{}"]/repo:location'.format(data_type)
+        primary_element = self.repomd_xml.find(find_query, namespaces=_ns)
+        primary_path = self.path / primary_element.get('href')
+        primary_url = self.base._replace(path=str(primary_path)).geturl()
+        return primary_url
 
-    primary_element = repomd_xml.find(find_query, namespaces=_ns)
-    primary_path = path / primary_element.get('href')
-    primary_url = base._replace(path=str(primary_path)).geturl()
+    def get_repo_file_contents(self, data_type):
+        """Get the repometadata for the type in question.
 
-    with urllib.request.urlopen(primary_url) as response:
-        with io.BytesIO(response.read()) as compressed:
-            if primary_url.endswith('.gz'):
-                with gzip.GzipFile(fileobj=compressed) as uncompressed:
-                    return uncompressed.read()
-            if primary_url.endswith('.bz2'):
-                with bz2.BZ2File(compressed) as uncompressed:
-                    return uncompressed.read()
+        Parameters:
+            data_type - The XML Node to look for, usually 'primary' or 'primary_db'
+
+        Returns:
+            (bytes) - An uncompressed bytes object from the URL referenced 
+                    in the found xml node.
+
+        Common Exceptions:
+            Will raise AttributeError when the DataType is not found
+        """
+        primary_url = self.get_repo_file_url(data_type)
+
+        with urllib.request.urlopen(primary_url) as response:
+            with io.BytesIO(response.read()) as compressed:
+                if primary_url.endswith('.gz'):
+                    with gzip.GzipFile(fileobj=compressed) as uncompressed:
+                        return uncompressed.read()
+                if primary_url.endswith('.bz2'):
+                    with bz2.BZ2File(compressed) as uncompressed:
+                        return uncompressed.read()
 
 def load(baseurl):
-    # parse baseurl to allow manipulating the path
-    base = urllib.parse.urlparse(baseurl)
-    path = pathlib.PurePosixPath(base.path)
-
-    # first we must get the repomd.xml file
-    repomd_path = path / 'repodata' / 'repomd.xml'
-    repomd_url = base._replace(path=str(repomd_path)).geturl()
-
+    repomd_obj = RepoMD(baseurl)
     repo_obj = None
     # download and parse repomd.xml
-    with urllib.request.urlopen(repomd_url) as response:
-        repomd_xml = defusedxml.lxml.fromstring(response.read())
     try:
-        primary_contents = get_primary_contents(base, path, repomd_xml, 'primary_db')
+        primary_contents = repomd_obj.get_repo_file_contents('primary_db')
         repo_obj = SQLiteRepo(baseurl, primary_contents)
     except AttributeError as e:
         # silencing this error so that we can pass to the next exception
         pass
     if not repo_obj:
-        primary_contents = get_primary_contents(base, path, repomd_xml, 'primary')
+        primary_contents = repomd_obj.get_repo_file_contents('primary')
         repo_obj = XmlRepo(baseurl, primary_contents)
     return repo_obj
 
