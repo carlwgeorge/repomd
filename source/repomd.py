@@ -19,6 +19,10 @@ _ns = {
 }
 
 
+def get_repomd_obj(baseurl):
+    return RepoMD(baseurl)
+
+
 class RepoMD():
     def __init__(self, baseurl):
         # parse baseurl to allow manipulating the path
@@ -64,7 +68,7 @@ class RepoMD():
                         return uncompressed.read()
 
 def load(baseurl):
-    repomd_obj = RepoMD(baseurl)
+    repomd_obj = get_repomd_obj(baseurl)
     repo_obj = None
     # download and parse repomd.xml
     try:
@@ -210,6 +214,14 @@ class XmlPackage(BasePackage):
     @property
     def name(self):
         return self._element.findtext('common:name', namespaces=_ns)
+
+    @property
+    def pkgId(self):
+        return self._element.findtext('common:checksum', namespaces=_ns)
+
+    @property
+    def checksum_type(self):
+        return self._element.find('common:checksum', namespaces=_ns).get('type')
 
     @property
     def arch(self):
