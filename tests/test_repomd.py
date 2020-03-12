@@ -1,7 +1,9 @@
 import copy
 import datetime
+import defusedxml.lxml
 import pathlib
 import unittest.mock
+import urllib
 
 import lxml.etree
 import pytest
@@ -45,6 +47,118 @@ def brisket(repo):
 @pytest.fixture
 def pork_ribs(repo):
     return repo.find('pork-ribs')
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_valid_load_mirrorlist(mock_urlopen):
+    data = b'http://test1.mirror.com/CentOS/7\nhttp://test2.mirror.com/CentOS'  # noqa
+
+    expected = [
+        'http://test1.mirror.com/CentOS/7',
+        'http://test2.mirror.com/CentOS'
+    ]
+
+    m = unittest.mock.MagicMock()
+    m.read.return_value = data
+    mock_urlopen.return_value.__enter__.return_value = m
+
+    assert repomd._load_mirrorlist('http://mirrorlist.mirror.com') == expected
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_no_data_load_mirrorlist(mock_urlopen):
+    m = unittest.mock.MagicMock()
+    m.read.return_value = b''
+    mock_urlopen.return_value.__enter__.return_value = m
+
+    assert repomd._load_mirrorlist('http://mirrorlist.mirror.com') == []
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_invalid_url_load_mirrorlist(mock_urlopen):
+    data = b'http://test1.mirror.com/CentOS\nsomestring\nhttp://\n://test\nhttp://test2.mirror.com/CentOS/7'  # noqa
+
+    expected = [
+        'http://test1.mirror.com/CentOS',
+        'http://test2.mirror.com/CentOS/7'
+    ]
+
+    m = unittest.mock.MagicMock()
+    m.read.return_value = data
+    mock_urlopen.return_value.__enter__.return_value = m
+
+    assert repomd._load_mirrorlist('http://mirrorlist.mirror.com') == expected
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_exception_load_mirrorlist(mock_urlopen):
+    mock_urlopen.return_value.__enter__.side_effect = Exception
+    assert repomd._load_mirrorlist('http://mirrorlist.mirror.com') == []
+
+
+def test_parse_baseurl():
+    base, path = repomd._parse_baseurl('http://test.url.com/some/path')
+
+    assert base.geturl() == 'http://test.url.com/some/path'
+    assert path == pathlib.PurePosixPath('/some/path')
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_load_repomd_not_found(mock_urlopen):
+    mock_urlopen.return_value.__enter__.side_effect = urllib.error.HTTPError(
+        url='', code=404, msg='', hdrs=None, fp=None)
+
+    with pytest.raises(repomd.NotRepoException):
+        base, path = repomd._parse_baseurl('http://example.com')
+        repomd._load_repomd(base, path)
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_load_repomd_urllib_reraise_exception(mock_urlopen):
+    mock_urlopen.side_effect = urllib.error.HTTPError(
+        url='', code=500, msg='', hdrs=None, fp=None)
+
+    with pytest.raises(urllib.error.HTTPError):
+        base, path = repomd._parse_baseurl('http://example.com')
+        repomd._load_repomd(base, path)
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+def test_load_repomd_other_exception(mock_urlopen):
+    mock_urlopen.side_effect = Exception
+    with pytest.raises(Exception):
+        base, path = repomd._parse_baseurl('http://example.com')
+        repomd._load_repomd(base, path)
+
+
+@unittest.mock.patch('repomd._load_mirrorlist')
+@unittest.mock.patch('repomd._load_repomd')
+def test_load_fail_mirrorlist(mock_one, mock_two):
+    mock_one.side_effect = repomd.NotRepoException
+    mock_two.return_value = []
+
+    with pytest.raises((repomd.NotRepoException,
+                        repomd.NotRepoException)):
+        repomd.load('https://example.com')
+
+
+@unittest.mock.patch('repomd.urllib.request.urlopen')
+@unittest.mock.patch('repomd._load_mirrorlist')
+@unittest.mock.patch('repomd._load_repomd')
+def test_load_fallback_mirrorlist(mock_one, mock_two, mock_three):
+    repo, primary = load_test_repodata('tests/data/repo')
+    f1 = Exception
+    f2 = defusedxml.lxml.fromstring(repo)
+
+    mock_one.side_effect = (repomd.NotRepoException, f1, f2)
+
+    mock_two.return_value = [
+        'http://test1.mirror.com/CentOS/7',
+        'http://test2.mirror.com/CentOS',
+    ]
+
+    mock_three.return_value.__enter__.return_value.read.return_value = primary
+    repomd.load('https://example.com')
 
 
 def test_repo(repo):

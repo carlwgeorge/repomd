@@ -14,18 +14,74 @@ _ns = {
 }
 
 
-def load(baseurl):
-    # parse baseurl to allow manipulating the path
-    base = urllib.parse.urlparse(baseurl)
-    path = pathlib.PurePosixPath(base.path)
+class NotRepoException(Exception):
+    pass
 
+
+def _load_mirrorlist(url):
+    mirrors = []
+
+    try:
+        with urllib.request.urlopen(url) as response:
+            result = response.read().decode('utf-8')
+            result = result.splitlines()
+
+            for r in result:
+                u = urllib.parse.urlparse(r)
+
+                if u.scheme in ['http', 'https'] and u.netloc:
+                    mirrors.append(u.geturl())
+    except Exception:
+        pass
+
+    return mirrors
+
+
+def _load_repomd(base, path):
     # first we must get the repomd.xml file
     repomd_path = path / 'repodata' / 'repomd.xml'
     repomd_url = base._replace(path=str(repomd_path)).geturl()
 
     # download and parse repomd.xml
-    with urllib.request.urlopen(repomd_url) as response:
-        repomd_xml = defusedxml.lxml.fromstring(response.read())
+    try:
+        with urllib.request.urlopen(repomd_url) as response:
+            repomd_xml = defusedxml.lxml.fromstring(response.read())
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise NotRepoException(f'{repomd_url} does not exist') from None
+        else:
+            raise e
+
+    return repomd_xml
+
+
+def _parse_baseurl(baseurl):
+    base = urllib.parse.urlparse(baseurl)
+    path = pathlib.PurePosixPath(base.path)
+
+    return base, path
+
+
+def load(baseurl):
+    base, path = _parse_baseurl(baseurl)
+    repomd_xml = None
+
+    try:
+        repomd_xml = _load_repomd(base, path)
+    except NotRepoException:
+        mirrors = _load_mirrorlist(baseurl)
+
+        for mirror in mirrors:
+            try:
+                base, path = _parse_baseurl(mirror)
+                repomd_xml = _load_repomd(base, path)
+            except Exception:
+                continue
+            else:
+                break
+
+        if repomd_xml is None:
+            raise
 
     # determine the location of *primary.xml.gz
     primary_element = repomd_xml.find('repo:data[@type="primary"]/repo:location', namespaces=_ns)
