@@ -1,11 +1,10 @@
 import copy
 import datetime
-import lxml
 import pathlib
 import unittest.mock
 import urllib
+import xml.etree.ElementTree as ET
 
-import lxml.etree
 import pytest
 
 import repomd
@@ -148,7 +147,7 @@ def test_load_fail_mirrorlist(mock_one, mock_two):
 def test_load_fallback_mirrorlist(mock_one, mock_two, mock_three):
     repo, primary = load_test_repodata('tests/data/repo')
     f1 = Exception
-    f2 = lxml.etree.fromstring(repo)
+    f2 = ET.fromstring(repo)
 
     mock_one.side_effect = (repomd.NotRepoException, f1, f2)
 
@@ -163,7 +162,7 @@ def test_load_fallback_mirrorlist(mock_one, mock_two, mock_three):
 
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
-    assert isinstance(repo._metadata, lxml.etree._Element)
+    assert isinstance(repo._metadata, ET.Element)
 
 
 def test_repo_repr(repo):

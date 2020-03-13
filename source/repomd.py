@@ -1,10 +1,10 @@
 import datetime
 import gzip
 import io
-import lxml
 import pathlib
 import urllib.request
 import urllib.parse
+import xml.etree.ElementTree as ET
 
 
 _ns = {
@@ -45,7 +45,7 @@ def _load_repomd(base, path):
     # download and parse repomd.xml
     try:
         with urllib.request.urlopen(repomd_url) as response:
-            repomd_xml = lxml.etree.fromstring(response.read())
+            repomd_xml = ET.fromstring(response.read())
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise NotRepoException(f'{repomd_url} does not exist') from None
@@ -92,7 +92,7 @@ def load(baseurl):
     with urllib.request.urlopen(primary_url) as response:
         with io.BytesIO(response.read()) as compressed:
             with gzip.GzipFile(fileobj=compressed) as uncompressed:
-                metadata = lxml.etree.fromstring(uncompressed.read())
+                metadata = ET.fromstring(uncompressed.read())
 
     return Repo(baseurl, metadata)
 
