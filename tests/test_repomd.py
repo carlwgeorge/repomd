@@ -1,6 +1,6 @@
 import copy
 import datetime
-import defusedxml.lxml
+import lxml
 import pathlib
 import unittest.mock
 import urllib
@@ -148,7 +148,7 @@ def test_load_fail_mirrorlist(mock_one, mock_two):
 def test_load_fallback_mirrorlist(mock_one, mock_two, mock_three):
     repo, primary = load_test_repodata('tests/data/repo')
     f1 = Exception
-    f2 = defusedxml.lxml.fromstring(repo)
+    f2 = lxml.etree.fromstring(repo)
 
     mock_one.side_effect = (repomd.NotRepoException, f1, f2)
 

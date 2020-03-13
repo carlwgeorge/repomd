@@ -24,7 +24,6 @@ setuptools.setup(
     # markdown content type
     setup_requires=['setuptools>=38.6.0'],
     install_requires=[
-        'defusedxml',
         'lxml',
     ],
     extras_require={
