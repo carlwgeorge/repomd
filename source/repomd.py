@@ -1,3 +1,4 @@
+import collections
 import datetime
 import gzip
 import io
@@ -12,6 +13,21 @@ _ns = {
     'repo':   'http://linux.duke.edu/metadata/repo',
     'rpm':    'http://linux.duke.edu/metadata/rpm'
 }
+
+_fsns = {
+    'common': 'http://linux.duke.edu/metadata/filelists'
+}
+
+_cond_map = {
+    "EQ": "=",
+    "NE": "!=",
+    "GT": ">",
+    "LT": "<",
+    "GE": ">=",
+    "LE": "<="
+}
+
+Entry = collections.namedtuple('Entry', ['name', 'condition'])
 
 
 def load(baseurl):
@@ -32,23 +48,47 @@ def load(baseurl):
     primary_path = path / primary_element.get('href')
     primary_url = base._replace(path=str(primary_path)).geturl()
 
+    # determine the location of *filelists.xml.gz
+    filelists_element = repomd_xml.find('repo:data[@type="filelists"]/repo:location', namespaces=_ns)
+    filelists_path = path / filelists_element.get('href')
+    filelists_url = base._replace(path=str(filelists_path)).geturl()
+
     # download and parse *-primary.xml
     with urllib.request.urlopen(primary_url) as response:
         with io.BytesIO(response.read()) as compressed:
             with gzip.GzipFile(fileobj=compressed) as uncompressed:
                 metadata = defusedxml.lxml.fromstring(uncompressed.read())
 
-    return Repo(baseurl, metadata)
+    # download and parse *-filelists.xml
+    with urllib.request.urlopen(filelists_url) as response:
+        with io.BytesIO(response.read()) as compressed:
+            with gzip.GzipFile(fileobj=compressed) as uncompressed:
+                filelists = defusedxml.lxml.fromstring(uncompressed.read())
+
+    return Repo(baseurl, metadata, filelists)
+
+
+class Filelists:
+
+    def __init__(self, metadata):
+        self._metadata = metadata
+
+    def get_files(self, pkgid):
+        results = self._metadata.findall(
+            f'common:package[@pkgid="{pkgid}"]/common:file', namespaces=_fsns)
+
+        return [r.text for r in results]
 
 
 class Repo:
     """A dnf/yum repository."""
 
-    __slots__ = ['baseurl', '_metadata']
+    __slots__ = ['baseurl', '_metadata', '_filelists']
 
-    def __init__(self, baseurl, metadata):
+    def __init__(self, baseurl, metadata, filelists):
         self.baseurl = baseurl
         self._metadata = metadata
+        self._filelists = Filelists(filelists)
 
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.baseurl}">'
@@ -66,7 +106,10 @@ class Repo:
     def find(self, name):
         results = self._metadata.findall(f'common:package[common:name="{name}"]', namespaces=_ns)
         if results:
-            return Package(results[-1])
+            result = results[-1]
+            pkgid = result.findtext('common:checksum', namespaces=_ns)
+            filelist = self._filelists.get_files(pkgid)
+            return Package(results[-1], filelist)
         else:
             return None
 
@@ -80,10 +123,15 @@ class Repo:
 class Package:
     """An RPM package from a repository."""
 
-    __slots__ = ['_element']
+    __slots__ = ['_element', '_filelist']
 
-    def __init__(self, element):
+    def __init__(self, element, filelist):
         self._element = element
+        self._filelist = filelist
+
+    @property
+    def filelist(self):
+        return self._filelist
 
     @property
     def name(self):
@@ -122,6 +170,16 @@ class Package:
         return self._element.findtext('common:format/rpm:sourcerpm', namespaces=_ns)
 
     @property
+    def buildhost(self):
+        return self._element.findtext(
+            'common:format/rpm:buildhost', namespaces=_ns)
+
+    @property
+    def group(self):
+        return self._element.findtext(
+            'common:format/rpm:group', namespaces=_ns)
+
+    @property
     def build_time(self):
         build_time = self._element.find('common:time', namespaces=_ns).get('build')
         return datetime.datetime.fromtimestamp(int(build_time))
@@ -145,6 +203,48 @@ class Package:
     @property
     def release(self):
         return self._version_info.get('rel')
+
+    @property
+    def provides(self):
+        provides = self._element.findall(
+            'common:format/rpm:provides/rpm:entry', namespaces=_ns)
+        return self._entries(provides)
+
+    @property
+    def requires(self):
+        requires = self._element.findall(
+            'common:format/rpm:requires/rpm:entry', namespaces=_ns)
+        return self._entries(requires)
+
+    @property
+    def conflicts(self):
+        conflicts = self._element.findall(
+            'common:format/rpm:conflicts/rpm:entry', namespaces=_ns)
+        return self._entries(conflicts)
+
+    @property
+    def obsoletes(self):
+        obsoletes = self._element.findall(
+            'common:format/rpm:obsoletes/rpm:entry', namespaces=_ns)
+        return self._entries(obsoletes)
+
+    def _entries(self, entries):
+        def condition(one):
+            epoch = one.get('epoch')
+            ver = one.get('ver')
+            rel = one.get('rel')
+            flags = one.get('flags')
+            if one.get('ver'):
+                epoch = f"{epoch}:" if int(epoch) else ""
+                rel = f"-{rel}" if rel else ""
+
+                return "{cond} {evr}".format(
+                    evr=f"{epoch}{ver}{rel}",
+                    cond=_cond_map[flags])
+
+            return "-"
+
+        return [Entry(one.get("name"), condition(one)) for one in entries]
 
     @property
     def vr(self):
