@@ -3,7 +3,7 @@ import datetime
 import pathlib
 import unittest.mock
 
-import lxml.etree
+import glob
 import pytest
 
 import repomd
@@ -21,22 +21,17 @@ def load_test_repodata(base):
     base = pathlib.Path(base)
     with (base / 'repodata' / 'repomd.xml').open(mode='rb') as f:
         repomd_xml = f.read()
-    with (base / 'repodata' / 'primary.xml.gz').open(mode='rb') as f:
-        primary_xml = f.read()
-    return (repomd_xml, primary_xml)
+    repo_glob = '{}/repodata/*-primary.sqlite.bz2'.format(base)
+    primary_path = glob.glob(repo_glob)[0]
+    with open(primary_path, mode='rb') as f:
+        primary_sqlite = f.read()
+    return (repomd_xml, primary_sqlite)
 
 
 @pytest.fixture
 @unittest.mock.patch('repomd.urllib.request.urlopen')
 def repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_test_repodata('tests/data/repo')
-    return repomd.load('https://example.com')
-
-
-@pytest.fixture
-@unittest.mock.patch('repomd.urllib.request.urlopen')
-def empty_repo(mock_urlopen):
-    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_test_repodata('tests/data/empty_repo')
+    mock_urlopen.return_value.__enter__.return_value.read.side_effect = load_test_repodata('tests/data/sqlite_repo')
     return repomd.load('https://example.com')
 
 
@@ -57,20 +52,18 @@ def pork_ribs(repo):
 
 def test_repo(repo):
     assert repo.baseurl == 'https://example.com'
-    assert isinstance(repo._metadata, lxml.etree._Element)
 
 
 def test_repo_repr(repo):
-    assert repr(repo) == '<XmlRepo: "https://example.com">'
+    assert repr(repo) == '<SQLiteRepo: "https://example.com">'
 
 
 def test_repo_str(repo):
     assert str(repo) == 'https://example.com'
 
 
-def test_repo_len(repo, empty_repo):
+def test_repo_len(repo):
     assert len(repo) == 5
-    assert len(empty_repo) == 0
 
 
 def test_find(repo):
@@ -96,7 +89,7 @@ def test_iter(repo):
 
 def test_package(chicken):
     buildtime = get_buildtimes('chicken-2.2.10-1.fc27.noarch.rpm')
-    assert repr(chicken) == '<XmlPackage: "chicken-2.2.10-1.fc27.noarch">'
+    assert repr(chicken) == '<SQLitePackage: "chicken-2.2.10-1.fc27.noarch">'
     assert chicken.name == 'chicken'
     assert chicken.arch == 'noarch'
     assert chicken.summary == 'Chicken'
@@ -116,13 +109,11 @@ def test_package(chicken):
     assert chicken.evr == '2.2.10-1.fc27'
     assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
-    assert chicken.pkgId == 'abd1acc2734739866279c539a4b9cf7c51cc856fdfd0033eb48a11f87f5c0e2b'
-    assert chicken.checksum_type == 'sha256'
 
 
 def test_package_with_epoch(brisket):
     buildtime = get_buildtimes('brisket-5.1.1-1.fc27.noarch.rpm')
-    assert repr(brisket) == '<XmlPackage: "brisket-1:5.1.1-1.fc27.noarch">'
+    assert repr(brisket) == '<SQLitePackage: "brisket-1:5.1.1-1.fc27.noarch">'
     assert brisket.name == 'brisket'
     assert brisket.arch == 'noarch'
     assert brisket.summary == 'Brisket'
@@ -146,7 +137,7 @@ def test_package_with_epoch(brisket):
 
 def test_subpackage(pork_ribs):
     buildtime = get_buildtimes('pork-ribs-3.2.0-1.fc27.noarch.rpm')
-    assert repr(pork_ribs) == '<XmlPackage: "pork-ribs-3.2.0-1.fc27.noarch">'
+    assert repr(pork_ribs) == '<SQLitePackage: "pork-ribs-3.2.0-1.fc27.noarch">'
     assert pork_ribs.name == 'pork-ribs'
     assert pork_ribs.arch == 'noarch'
     assert pork_ribs.summary == 'Pork ribs'
