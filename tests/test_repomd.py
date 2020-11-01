@@ -116,6 +116,8 @@ def test_package(chicken):
     assert chicken.evr == '2.2.10-1.fc27'
     assert chicken.nevr == 'chicken-2.2.10-1.fc27'
     assert chicken.nevra == 'chicken-2.2.10-1.fc27.noarch'
+    assert chicken.pkgId == 'abd1acc2734739866279c539a4b9cf7c51cc856fdfd0033eb48a11f87f5c0e2b'
+    assert chicken.checksum_type == 'sha256'
 
 
 def test_package_with_epoch(brisket):
