@@ -10,8 +10,6 @@ import sqlite3
 import tempfile
 
 
-import pprint
-
 _ns = {
     'common': 'http://linux.duke.edu/metadata/common',
     'repo':   'http://linux.duke.edu/metadata/repo',
@@ -50,7 +48,7 @@ class RepoMD():
             data_type - The XML Node to look for, usually 'primary' or 'primary_db'
 
         Returns:
-            (bytes) - An uncompressed bytes object from the URL referenced 
+            (bytes) - An uncompressed bytes object from the URL referenced
                     in the found xml node.
 
         Common Exceptions:
@@ -67,6 +65,7 @@ class RepoMD():
                     with bz2.BZ2File(compressed) as uncompressed:
                         return uncompressed.read()
 
+
 def load(baseurl):
     repomd_obj = get_repomd_obj(baseurl)
     repo_obj = None
@@ -74,13 +73,14 @@ def load(baseurl):
     try:
         primary_contents = repomd_obj.get_repo_file_contents('primary_db')
         repo_obj = SQLiteRepo(baseurl, primary_contents)
-    except AttributeError as e:
+    except AttributeError:
         # silencing this error so that we can pass to the next exception
         pass
     if not repo_obj:
         primary_contents = repomd_obj.get_repo_file_contents('primary')
         repo_obj = XmlRepo(baseurl, primary_contents)
     return repo_obj
+
 
 class BasePackage:
 
@@ -127,9 +127,10 @@ class BasePackage:
     def __repr__(self):
         return f'<{self.__class__.__name__}: "{self.nevra}">'
 
+
 class SQLitePackage(BasePackage):
     """A Class for inspecting packages in an SQLite-based repo.
-    
+
     Most properties are generated based on primary.packages column headers and dynamically
     generated from the pkg_row constructor parameter.
 
@@ -161,7 +162,7 @@ class SQLitePackage(BasePackage):
         location_base TEXT
         checksum_type TEXT
 
-    These could vary between different yum repo versions but should be consistent with most major 
+    These could vary between different yum repo versions but should be consistent with most major
     red hat-derived distros in 2019.
 
     There are some other properties as well that are not dynamically generated.
@@ -175,7 +176,7 @@ class SQLitePackage(BasePackage):
 
     Parameters:
         pkg_row - an sqlite3.Row object representing the sqlite table.
-    
+
     """
     def __init__(self, pkg_row):
         self.pkg_row = pkg_row
@@ -327,7 +328,7 @@ class SQLiteRepo(BaseRepo):
     def __init__(self, baseurl, metadata):
         self.baseurl = baseurl
         self.db_file = tempfile.NamedTemporaryFile()
-        self.db_file.write(metadata) 
+        self.db_file.write(metadata)
         self.conn = sqlite3.connect(self.db_file.name)
         self.conn.row_factory = sqlite3.Row
 
@@ -360,4 +361,3 @@ class SQLiteRepo(BaseRepo):
         if res:
             return SQLitePackage(res)
         return None
-
