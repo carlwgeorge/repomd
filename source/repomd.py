@@ -118,6 +118,10 @@ class Package:
         return self._element.findtext('common:format/rpm:vendor', namespaces=_ns)
 
     @property
+    def buildhost(self):
+        return self._element.findtext('common:format/rpm:buildhost', namespaces=_ns)
+
+    @property
     def sourcerpm(self):
         return self._element.findtext('common:format/rpm:sourcerpm', namespaces=_ns)
 
