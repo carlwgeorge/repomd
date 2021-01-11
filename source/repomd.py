@@ -118,6 +118,10 @@ class Package:
         return self._element.findtext('common:format/rpm:vendor', namespaces=_ns)
 
     @property
+    def buildhost(self):
+        return self._element.findtext('common:format/rpm:buildhost', namespaces=_ns)
+
+    @property
     def sourcerpm(self):
         return self._element.findtext('common:format/rpm:sourcerpm', namespaces=_ns)
 
@@ -125,6 +129,21 @@ class Package:
     def build_time(self):
         build_time = self._element.find('common:time', namespaces=_ns).get('build')
         return datetime.datetime.fromtimestamp(int(build_time))
+
+    @property
+    def package_size(self):
+        package_size = self._element.find('common:size', namespaces=_ns).get('package')
+        return int(package_size)
+
+    @property
+    def installed_size(self):
+        installed_size = self._element.find('common:size', namespaces=_ns).get('installed')
+        return int(installed_size)
+
+    @property
+    def archive_size(self):
+        archive_size = self._element.find('common:size', namespaces=_ns).get('archive')
+        return int(archive_size)
 
     @property
     def location(self):
