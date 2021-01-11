@@ -127,6 +127,21 @@ class Package:
         return datetime.datetime.fromtimestamp(int(build_time))
 
     @property
+    def package_size(self):
+        package_size = self._element.find('common:size', namespaces=_ns).get('package')
+        return int(package_size)
+
+    @property
+    def installed_size(self):
+        installed_size = self._element.find('common:size', namespaces=_ns).get('installed')
+        return int(installed_size)
+
+    @property
+    def archive_size(self):
+        archive_size = self._element.find('common:size', namespaces=_ns).get('archive')
+        return int(archive_size)
+
+    @property
     def location(self):
         return self._element.find('common:location', namespaces=_ns).get('href')
 
