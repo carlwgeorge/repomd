@@ -6,6 +6,13 @@ import pathlib
 import urllib.request
 import urllib.parse
 
+try:
+    import ssl
+    import certifi
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    ssl_context = None
+
 
 _ns = {
     'common': 'http://linux.duke.edu/metadata/common',
@@ -24,7 +31,7 @@ def load(baseurl):
     repomd_url = base._replace(path=str(repomd_path)).geturl()
 
     # download and parse repomd.xml
-    with urllib.request.urlopen(repomd_url) as response:
+    with urllib.request.urlopen(repomd_url, context=ssl_context) as response:
         repomd_xml = defusedxml.lxml.fromstring(response.read())
 
     # determine the location of *primary.xml.gz
@@ -33,7 +40,7 @@ def load(baseurl):
     primary_url = base._replace(path=str(primary_path)).geturl()
 
     # download and parse *-primary.xml
-    with urllib.request.urlopen(primary_url) as response:
+    with urllib.request.urlopen(primary_url, context=ssl_context) as response:
         with io.BytesIO(response.read()) as compressed:
             with gzip.GzipFile(fileobj=compressed) as uncompressed:
                 metadata = defusedxml.lxml.fromstring(uncompressed.read())
