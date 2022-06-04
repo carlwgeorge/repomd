@@ -131,6 +131,22 @@ class Package:
         return self._element.find('common:location', namespaces=_ns).get('href')
 
     @property
+    def checksum(self):
+        return self._element.findtext('common:checksum', namespaces=_ns)
+
+    @property
+    def _checksum_info(self):
+        return self._element.find('common:checksum', namespaces=_ns)
+
+    @property
+    def checksum_type(self):
+        return self._checksum_info.get('type')
+
+    @property
+    def checksum_pkgid(self):
+        return self._checksum_info.get('pkgid')
+
+    @property
     def _version_info(self):
         return self._element.find('common:version', namespaces=_ns)
 
