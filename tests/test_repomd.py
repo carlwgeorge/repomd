@@ -100,6 +100,9 @@ def test_package(chicken):
     assert chicken.build_time == datetime.datetime.fromtimestamp(1525208602)
     assert chicken.location == 'chicken-2.2.10-1.fc27.noarch.rpm'
     assert chicken.epoch == '0'
+    assert chicken.checksum == '3e5d70aca9624e0c738651d1ff811de88c8e8bebfde4b52778fd264631d530fc'
+    assert chicken.checksum_type == 'sha256'
+    assert chicken.checksum_pkgid == 'YES'
     assert chicken.version == '2.2.10'
     assert chicken.release == '1.fc27'
     assert chicken.vr == '2.2.10-1.fc27'
@@ -123,6 +126,9 @@ def test_package_with_epoch(brisket):
     assert brisket.build_time == datetime.datetime.fromtimestamp(1525208602)
     assert brisket.location == 'brisket-5.1.1-1.fc27.noarch.rpm'
     assert brisket.epoch == '1'
+    assert brisket.checksum == '9f1ba9973df8f6184214ecfc67e693b96d615ef58321a62142089464f50413b9'
+    assert brisket.checksum_type == 'sha256'
+    assert brisket.checksum_pkgid == 'YES'
     assert brisket.version == '5.1.1'
     assert brisket.release == '1.fc27'
     assert brisket.vr == '5.1.1-1.fc27'
